@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Series de Tiempo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        .graph-container {
+            margin-bottom: 30px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-4">
+    <h2 class="text-center">📈 Análisis de Series de Tiempo</h2>
+    
+    <div class="card mt-3">
+        <div class="card-body">
+            <form method="get" action="/series_tiempo">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>📅 Columna de Fecha:</label>
+                        <select name="fecha" class="form-control" required>
+                            <option value="">Selecciona...</option>
+                            {% for col in columnas %}
+                                <option value="{{ col }}">{{ col }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label>📊 Columna de Valor:</label>
+                        <select name="valor" class="form-control" required>
+                            <option value="">Selecciona...</option>
+                            {% for col in columnas %}
+                                <option value="{{ col }}">{{ col }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary mt-3">📈 Generar Gráficos</button>
+                <a href="/" class="btn btn-secondary mt-3">🏠 Volver</a>
+            </form>
+        </div>
+    </div>
+
+    {% if error %}
+        <div class="alert alert-danger mt-3">{{ error }}</div>
+    {% endif %}
+
+    {% if graphs %}
+        <div class="mt-4">
+            <h3 class="text-center">📊 Pronósticos - 5 Métodos</h3>
+            
+            <div class="graph-container">
+                <div id="graph1"></div>
+                <div class="alert alert-info mt-2">
+                    <strong>🔵 Método Ingenuo:</strong> Predice que el valor futuro será igual al último valor observado.
+                </div>
+            </div>
+            
+            <div class="graph-container">
+                <div id="graph2"></div>
+                <div class="alert alert-info mt-2">
+                    <strong>🟡 Método de la Media:</strong> Predice usando el promedio de todos los datos históricos.
+                </div>
+            </div>
+            
+            <div class="graph-container">
+                <div id="graph3"></div>
+                <div class="alert alert-info mt-2">
+                    <strong>🟢 Media Móvil:</strong> Promedia los últimos N valores (ventana=3) y se va actualizando.
+                </div>
+            </div>
+            
+            <div class="graph-container">
+                <div id="graph4"></div>
+                <div class="alert alert-info mt-2">
+                    <strong>🟣 Método de la Deriva:</strong> Proyecta una línea recta desde el primer hasta el último valor.
+                </div>
+            </div>
+            
+            <div class="graph-container">
+                <div id="graph5"></div>
+                <div class="alert alert-info mt-2">
+                    <strong>🟤 Método Ingenuo Estacional:</strong> Repite el patrón del último periodo completo (últimos 7 datos).
+                </div>
+            </div>
+        </div>
+        
+        <script>
+            var graphs = {{ graphs | safe }};
+            Plotly.newPlot('graph1', graphs[0].data, graphs[0].layout);
+            Plotly.newPlot('graph2', graphs[1].data, graphs[1].layout);
+            Plotly.newPlot('graph3', graphs[2].data, graphs[2].layout);
+            Plotly.newPlot('graph4', graphs[3].data, graphs[3].layout);
+            Plotly.newPlot('graph5', graphs[4].data, graphs[4].layout);
+        </script>
+    {% endif %}
+</div>
+</body>
+</html>

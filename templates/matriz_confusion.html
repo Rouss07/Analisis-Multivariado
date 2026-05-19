@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Matriz de Confusión</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-4">
+    <h2 class="text-center">📊 Matriz de Confusión y Métricas</h2>
+    
+    <div class="card mt-3">
+        <div class="card-body">
+            <form method="get" action="/matriz_confusion">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>✅ Columna Real:</label>
+                        <select name="real" class="form-control" required>
+                            <option value="">Selecciona...</option>
+                            {% for col in columnas %}
+                                <option value="{{ col }}">{{ col }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label>🤖 Columna Predicha:</label>
+                        <select name="predicha" class="form-control" required>
+                            <option value="">Selecciona...</option>
+                            {% for col in columnas %}
+                                <option value="{{ col }}">{{ col }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-danger mt-3">📊 Calcular Matriz</button>
+                <a href="/" class="btn btn-secondary mt-3">🏠 Volver</a>
+            </form>
+        </div>
+    </div>
+
+    {% if error %}
+        <div class="alert alert-danger mt-3">{{ error }}</div>
+    {% endif %}
+
+    {% if cm and tiene_datos %}
+        <div class="mt-4">
+            <h4>📉 Matriz de Confusión</h4>
+            <table class="table table-bordered text-center">
+                <thead>
+                    <tr class="table-dark">
+                        <th>Real \ Predicho</th>
+                        {% for i in range(cm[0]|length) %}
+                            <th>Clase {{ i }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in range(cm|length) %}
+                    <tr>
+                        <th class="table-dark">Clase {{ i }}</th>
+                        {% for j in range(cm[i]|length) %}
+                            {% if i == j %}
+                                <td style="background-color:#90EE90; font-weight:bold;">{{ cm[i][j] }}</td>
+                            {% else %}
+                                <td style="background-color:#FFB6C1;">{{ cm[i][j] }}</td>
+                            {% endif %}
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <h4 class="mt-4">📈 Métricas de Evaluación</h4>
+            <table class="table table-striped">
+                <thead class="table-dark">
+                    <tr><th>Métrica</th><th>Valor</th><th>Interpretación</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Exactitud (Accuracy)</td>
+                        <td><span class="badge bg-success fs-6">{{ "%.4f"|format(accuracy) }}</span></td>
+                        <td>(VP + VN) / Total</td>
+                    </tr>
+                    <tr>
+                        <td>Precisión (Precision)</td>
+                        <td><span class="badge bg-primary fs-6">{{ "%.4f"|format(precision) }}</span></td>
+                        <td>VP / (VP + FP)</td>
+                    </tr>
+                    <tr>
+                        <td>Sensibilidad (Recall)</td>
+                        <td><span class="badge bg-info fs-6">{{ "%.4f"|format(recall) }}</span></td>
+                        <td>VP / (VP + FN)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+</div>
+</body>
+</html>
